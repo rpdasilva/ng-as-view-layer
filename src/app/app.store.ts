@@ -1,16 +1,17 @@
 import { combineReducers, createStore, applyMiddleware, compose, StoreEnhancer } from 'redux';
 import logger from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
-import { appEpics, IAppState, routerReducer, routerMiddleware, routerEnhancer } from './store';
+import { appEpics, IAppState, counterReducer, jsonReducer} from './store';
 
 export const rootReducer = combineReducers<IAppState>({
-  location: routerReducer,
+  counter: counterReducer,
+  json: jsonReducer
 });
 
 const epicMiddleware = createEpicMiddleware(appEpics);
 
-const middlewares = applyMiddleware(epicMiddleware, routerMiddleware, logger);
+const middlewares = applyMiddleware(epicMiddleware, logger);
 
-const enhancers = <StoreEnhancer<IAppState>> compose(routerEnhancer, middlewares);
+const enhancers = <StoreEnhancer<IAppState>> compose(middlewares);
 
 export const store = createStore<IAppState>(rootReducer, enhancers);

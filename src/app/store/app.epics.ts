@@ -1,10 +1,11 @@
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/delay';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mapTo';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/dom/ajax';
 import { Observable } from 'rxjs/Observable';
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ActionsObservable } from 'redux-observable';
 import {
   createFetchJsonSucceededAction,
   createPongAction,
@@ -17,9 +18,10 @@ export const testEpic = (action$: Observable<any>) =>
     .delay(3000)
     .mapTo(createPongAction('PONG'));
 
-export const getJSONMock = (action$: Observable<any>) =>
-  action$.filter(action => action.type === FETCH_JSON_ACTION_TYPE)
+export const getJSONMock = (action$: ActionsObservable<any>) =>
+  action$.ofType(FETCH_JSON_ACTION_TYPE)
     .switchMap(() => Observable.ajax('https://jsonplaceholder.typicode.com/posts')
-      .map(json => (createFetchJsonSucceededAction(json))));
+      .map(({response}) => response)
+      .map(createFetchJsonSucceededAction));
 
 export const appEpics = combineEpics(testEpic, getJSONMock);

@@ -1,10 +1,17 @@
 import 'rxjs/add/operator/distinctUntilChanged';
 import { Component } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
+import { NgRedux, select } from '@angular-redux/store';
 import { store } from './app.store';
 import { Router } from '@angular/router';
-import { locationPathSelector } from './store/app.selectors';
-import { IAppState, createPingAction, createRouterAction, createFetchJsonAction } from './store';
+import { countPathSelector, postsPathSelector } from './store/app.selectors';
+import {
+  IAppState,
+  createPingAction,
+  createIncrementAction,
+  createFetchJsonAction,
+  createDecrementAction,
+  createResetAction
+} from './store';
 
 @Component({
   selector: 'app-root',
@@ -12,24 +19,29 @@ import { IAppState, createPingAction, createRouterAction, createFetchJsonAction 
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-
+  @select(countPathSelector) count$;
+  @select(postsPathSelector) posts$;
   title = 'app';
 
-  constructor(private ngRedux: NgRedux<IAppState>, private router: Router) {
-    ngRedux.provideStore(store);
-    this.ngRedux.select(locationPathSelector)
-      .subscribe((path: string) => this.router.navigateByUrl(path));
-  }
+  constructor(private ngRedux: NgRedux<IAppState>) {}
 
   fireTestAction() {
     this.ngRedux.dispatch(createPingAction('PING'));
   }
 
-  changeRoute() {
-    this.ngRedux.dispatch(createRouterAction('HOME'));
+  increment() {
+    this.ngRedux.dispatch(createIncrementAction());
   }
 
-  getJSONMock() {
+  decrement() {
+    this.ngRedux.dispatch(createDecrementAction());
+  }
+
+  reset() {
+    this.ngRedux.dispatch(createResetAction());
+  }
+
+  fetchJson() {
     this.ngRedux.dispatch(createFetchJsonAction());
   }
 

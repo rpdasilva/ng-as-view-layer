@@ -1,11 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { NgReduxModule } from '@angular-redux/store';
-import { NgReduxRouterModule } from '@angular-redux/router';
+import { ApplicationRef, NgModule } from '@angular/core';
+import { NgRedux, NgReduxModule } from '@angular-redux/store';
 import { AppComponent } from './app.component';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from './home.component';
-
+import { IAppState } from './store';
+import { store } from './app.store';
 
 @NgModule({
   declarations: [
@@ -15,7 +15,6 @@ import { HomeComponent } from './home.component';
   imports: [
     BrowserModule,
     NgReduxModule,
-    NgReduxRouterModule,
     RouterModule.forRoot([
       { path: 'home', component: HomeComponent },
     ]),
@@ -23,4 +22,11 @@ import { HomeComponent } from './home.component';
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(appRef: ApplicationRef, ngRedux: NgRedux<IAppState>) {
+    ngRedux.provideStore(store);
+
+    // ngRedux.subscribe(() => appRef.tick());
+    ngRedux.subscribe(() => setTimeout(() => appRef.tick()));
+  }
+}
